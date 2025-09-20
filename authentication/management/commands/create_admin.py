@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand
 import requests
 from django.conf import settings
+import os
 
 class Command(BaseCommand):
     help = 'Create admin user in Supabase'
@@ -13,11 +14,19 @@ class Command(BaseCommand):
             'Content-Type': 'application/json'
         }
         
+        admin_email = os.environ.get('SUPABASE_ADMIN_EMAIL')
+        admin_password = os.environ.get('SUPABASE_ADMIN_PASSWORD')
+        admin_role = os.environ.get('SUPABASE_ADMIN_ROLE', 'admin')
+        
+        if not admin_email or not admin_password:
+            self.stdout.write(self.style.ERROR('Error: SUPABASE_ADMIN_EMAIL and SUPABASE_ADMIN_PASSWORD must be set in environment variables'))
+            return
+        
         data = {
-            'email': 'your email',
-            'password': 'Your password',
+            'email': admin_email,
+            'password': admin_password,
             'email_confirm': True,
-            'user_metadata': {'role': 'admin'}
+            'user_metadata': {'role': admin_role}
         }
         
         response = requests.post(url, json=data, headers=headers)
