@@ -14,8 +14,8 @@ class Command(BaseCommand):
         }
         
         data = {
-            'email': 'olajideweb@gmail.com',
-            'password': 'Jedu1122',
+            'email': 'your email',
+            'password': 'Your password',
             'email_confirm': True,
             'user_metadata': {'role': 'admin'}
         }

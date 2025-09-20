@@ -7,8 +7,8 @@ class SupabaseBackend(BaseBackend):
         try:
             # Use Supabase JS library to verify token
             client = supabase.create_client(
-                "https://bxcxcctsffkzszmbfypn.supabase.co",
-                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ4Y3hjY3RzZmZrenN6bWJmeXBuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgzMjAzNTEsImV4cCI6MjA3Mzg5NjM1MX0.65MFbh8Tc3I_11MKfg_XpBE0EjL95dRuM4MG9xS0GgM"
+                "YOUR_SUPABASE_URL",
+                "YOUR_SUPABASE_ANON_KEY"
             )
             user_data = client.auth.get_user(token)
             

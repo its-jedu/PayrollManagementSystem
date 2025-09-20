@@ -19,7 +19,7 @@ from rest_framework.routers import DefaultRouter
 from employees.views import EmployeeViewSet
 
 router = DefaultRouter()
-router.register(r'employees', EmployeeViewSet)  # ← Just register, no .as_view()
+router.register(r'employees', EmployeeViewSet)
 
 urlpatterns = [
     path('api/', include(router.urls)),

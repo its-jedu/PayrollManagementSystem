@@ -11,7 +11,7 @@ def create_user(request):
     password = request.data.get('password')
     role = request.data.get('role', 'hr')
     
-    # Use Supabase Admin API to create user
+    # Using Supabase Admin API to create user
     url = f"{settings.SUPABASE_URL}/auth/v1/admin/users"
     headers = {
         'Authorization': f'Bearer {settings.SUPABASE_SERVICE_KEY}',
