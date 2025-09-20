@@ -5,15 +5,16 @@ import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 import Employees from './components/Employees';
 import Payroll from './components/Payroll';
-import './App.css';
 
 function ProtectedRoute({ children }) {
   const { user } = useAuth();
   return user ? children : <Navigate to="/login" />;
 }
 
-console.log('Supabase URL:', process.env.REACT_APP_SUPABASE_URL);
-console.log('API URL:', process.env.REACT_APP_API_URL);
+function PublicRoute({ children }) {
+  const { user } = useAuth();
+  return !user ? children : <Navigate to="/" />;
+}
 
 function App() {
   return (
@@ -21,7 +22,14 @@ function App() {
       <Router>
         <div className="App">
           <Routes>
-            <Route path="/login" element={<Login />} />
+            {/* Public route - only show login if not authenticated */}
+            <Route path="/login" element={
+              <PublicRoute>
+                <Login />
+              </PublicRoute>
+            } />
+            
+            {/* Protected routes - only show if authenticated */}
             <Route path="/" element={
               <ProtectedRoute>
                 <Dashboard />
