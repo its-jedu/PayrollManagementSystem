@@ -13,7 +13,7 @@ function ProtectedRoute({ children }) {
 
 function PublicRoute({ children }) {
   const { user } = useAuth();
-  return !user ? children : <Navigate to="/dashboard" />;
+  return !user ? children : <Navigate to="/" />;
 }
 
 function App() {
@@ -30,7 +30,7 @@ function App() {
             } />
             
             {/* Protected routes - only show if authenticated */}
-            <Route path="/dashboard" element={
+            <Route path="/" element={
               <ProtectedRoute>
                 <Dashboard />
               </ProtectedRoute>
