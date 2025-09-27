@@ -19,45 +19,15 @@ const config: Config = {
     },
     extend: {
       colors: {
-        border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
+        border: "hsl(214, 32%, 91%)",
+        input: "hsl(214, 32%, 91%)",
+        ring: "hsl(221, 83%, 53%)",
+        background: "hsl(0, 0%, 100%)",
+        foreground: "hsl(222, 84%, 5%)",
         primary: {
-          DEFAULT: "hsl(221, 83%, 53%)",
-          foreground: "hsl(210, 40%, 98%)",
+        DEFAULT: "hsl(221, 83%, 53%)",
+        foreground: "hsl(210, 40%, 98%)",
         },
-        secondary: {
-          DEFAULT: "hsl(210, 40%, 96%)",
-          foreground: "hsl(222, 84%, 5%)",
-        },
-        destructive: {
-          DEFAULT: "hsl(0, 84.2%, 60.2%)",
-          foreground: "hsl(210, 40%, 98%)",
-        },
-        muted: {
-          DEFAULT: "hsl(210, 40%, 96%)",
-          foreground: "hsl(215.4, 16.3%, 46.9%)",
-        },
-        accent: {
-          DEFAULT: "hsl(210, 40%, 96%)",
-          foreground: "hsl(222, 84%, 5%)",
-        },
-        popover: {
-          DEFAULT: "hsl(0, 0%, 100%)",
-          foreground: "hsl(222, 84%, 5%)",
-        },
-        card: {
-          DEFAULT: "hsl(0, 0%, 100%)",
-          foreground: "hsl(222, 84%, 5%)",
-        },
-        sidebar: {
-          DEFAULT: "hsl(210, 40%, 98%)",
-          foreground: "hsl(222, 84%, 5%)",
-          border: "hsl(214.3, 31.8%, 91.4%)",
-        },
-      },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
