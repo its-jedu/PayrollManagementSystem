@@ -1,12 +1,15 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { supabase } from '@/lib/supabase';
 
 export interface User {
   id: string;
-  name: string;
   email: string;
-  role: string;
+  user_metadata: {
+    name?: string;
+    role?: string;
+  };
 }
 
 export function useAuth() {
@@ -15,24 +18,36 @@ export function useAuth() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    checkAuth();
+    getCurrentUser();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' && session) {
+        setUser(session.user as User);
+        setIsAuthenticated(true);
+        setIsLoading(false);
+      } else if (event === 'SIGNED_OUT') {
+        setUser(null);
+        setIsAuthenticated(false);
+        setIsLoading(false);
+      } else if (event === 'INITIAL_SESSION') {
+        setIsLoading(false);
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
-  const checkAuth = async () => {
+  const getCurrentUser = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const userData = localStorage.getItem('user');
-
-      if (token && userData) {
-        setUser(JSON.parse(userData));
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        setUser(session.user as User);
         setIsAuthenticated(true);
-        
-        // Optional: Verify token with backend
-        // await verifyToken(token);
       }
     } catch (error) {
-      console.error('Auth check failed:', error);
-      logout();
+      console.error('Error getting current user:', error);
     } finally {
       setIsLoading(false);
     }
@@ -40,36 +55,34 @@ export function useAuth() {
 
   const login = async (email: string, password: string) => {
     try {
-      // TODO: Replace with your actual login endpoint
-      const response = await fetch('http://localhost:8000/api/auth/login/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
+      setIsLoading(true);
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        localStorage.setItem('token', data.access_token || data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        setUser(data.user);
-        setIsAuthenticated(true);
-        return { success: true };
-      } else {
-        const errorData = await response.json();
-        return { success: false, error: errorData.detail || 'Login failed' };
+      if (error) {
+        return { success: false, error: error.message };
       }
+
+      if (data.user) {
+        return { success: true };
+      }
+
+      return { success: false, error: 'Login failed' };
     } catch (error) {
       return { success: false, error: 'Network error occurred' };
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    setUser(null);
-    setIsAuthenticated(false);
+  const logout = async () => {
+    try {
+      await supabase.auth.signOut();
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
   };
 
   return {

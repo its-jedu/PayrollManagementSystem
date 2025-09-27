@@ -14,7 +14,14 @@ export default function DashboardPage() {
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-            <p className="text-gray-600">Welcome back, {user?.name}</p>
+            <p className="text-gray-600">
+              Welcome back, {user?.user_metadata?.name || user?.email}
+            </p>
+            {user?.user_metadata?.role && (
+              <span className="inline-block mt-1 px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">
+                {user.user_metadata.role.toUpperCase()}
+              </span>
+            )}
           </div>
           <Button 
             onClick={logout}
