@@ -22,5 +22,6 @@ router = DefaultRouter()
 router.register(r'employees', EmployeeViewSet)
 
 urlpatterns = [
+    path('api/', include('authentication.urls')),
     path('api/', include(router.urls)),
 ]

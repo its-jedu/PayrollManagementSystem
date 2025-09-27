@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
 
 export interface User {
   id: string;
@@ -18,55 +17,21 @@ export function useAuth() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Clear any existing session on mount to ensure fresh start
-    const clearSession = async () => {
-      await supabase.auth.signOut();
-    };
-    
-    clearSession().then(() => {
-      getCurrentUser();
-    });
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('Auth state changed:', event);
-      
-      if (event === 'SIGNED_IN' && session) {
-        setUser(session.user as User);
-        setIsAuthenticated(true);
-      } else if (event === 'SIGNED_OUT') {
-        setUser(null);
-        setIsAuthenticated(false);
-      }
-      setIsLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
+    checkAuth();
   }, []);
 
-  const getCurrentUser = async () => {
+  const checkAuth = () => {
     try {
-      const { data: { session }, error } = await supabase.auth.getSession();
-      
-      if (error) {
-        console.error('Session error:', error);
-        setIsAuthenticated(false);
-        setUser(null);
-        return;
-      }
+      const token = localStorage.getItem('token');
+      const userData = localStorage.getItem('user');
 
-      if (session?.user) {
-        setUser(session.user as User);
+      if (token && userData) {
+        setUser(JSON.parse(userData));
         setIsAuthenticated(true);
-      } else {
-        setIsAuthenticated(false);
-        setUser(null);
       }
     } catch (error) {
-      console.error('Error getting current user:', error);
-      setIsAuthenticated(false);
-      setUser(null);
+      console.error('Auth check failed:', error);
+      logout();
     } finally {
       setIsLoading(false);
     }
@@ -75,20 +40,30 @@ export function useAuth() {
   const login = async (email: string, password: string) => {
     try {
       setIsLoading(true);
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+      
+      // Call your Django backend login endpoint
+      const response = await fetch('http://localhost:8000/api/auth/login/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
       });
 
-      if (error) {
-        return { success: false, error: error.message };
-      }
-
-      if (data.user) {
+      if (response.ok) {
+        const data = await response.json();
+        
+        // Store the token and user data
+        localStorage.setItem('token', data.access_token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        
+        setUser(data.user);
+        setIsAuthenticated(true);
         return { success: true };
+      } else {
+        const errorData = await response.json();
+        return { success: false, error: errorData.error || 'Login failed' };
       }
-
-      return { success: false, error: 'Login failed' };
     } catch (error) {
       return { success: false, error: 'Network error occurred' };
     } finally {
@@ -96,17 +71,11 @@ export function useAuth() {
     }
   };
 
-  const logout = async () => {
-    try {
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        console.error('Logout error:', error);
-      }
-      setUser(null);
-      setIsAuthenticated(false);
-    } catch (error) {
-      console.error('Logout error:', error);
-    }
+  const logout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setUser(null);
+    setIsAuthenticated(false);
   };
 
   return {
