@@ -18,22 +18,28 @@ export function useAuth() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    getCurrentUser();
+    // Clear any existing session on mount to ensure fresh start
+    const clearSession = async () => {
+      await supabase.auth.signOut();
+    };
+    
+    clearSession().then(() => {
+      getCurrentUser();
+    });
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth state changed:', event);
+      
       if (event === 'SIGNED_IN' && session) {
         setUser(session.user as User);
         setIsAuthenticated(true);
-        setIsLoading(false);
       } else if (event === 'SIGNED_OUT') {
         setUser(null);
         setIsAuthenticated(false);
-        setIsLoading(false);
-      } else if (event === 'INITIAL_SESSION') {
-        setIsLoading(false);
       }
+      setIsLoading(false);
     });
 
     return () => subscription.unsubscribe();
@@ -41,13 +47,26 @@ export function useAuth() {
 
   const getCurrentUser = async () => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { session }, error } = await supabase.auth.getSession();
+      
+      if (error) {
+        console.error('Session error:', error);
+        setIsAuthenticated(false);
+        setUser(null);
+        return;
+      }
+
       if (session?.user) {
         setUser(session.user as User);
         setIsAuthenticated(true);
+      } else {
+        setIsAuthenticated(false);
+        setUser(null);
       }
     } catch (error) {
       console.error('Error getting current user:', error);
+      setIsAuthenticated(false);
+      setUser(null);
     } finally {
       setIsLoading(false);
     }
@@ -79,7 +98,12 @@ export function useAuth() {
 
   const logout = async () => {
     try {
-      await supabase.auth.signOut();
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error('Logout error:', error);
+      }
+      setUser(null);
+      setIsAuthenticated(false);
     } catch (error) {
       console.error('Logout error:', error);
     }

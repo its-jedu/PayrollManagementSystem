@@ -10,13 +10,17 @@ export async function middleware(req: NextRequest) {
     data: { session },
   } = await supabase.auth.getSession()
 
-  // If user is not signed in and the current path is not /login, redirect to /login
-  if (!session && req.nextUrl.pathname !== '/login') {
+  console.log('Middleware - Path:', req.nextUrl.pathname, 'Session:', !!session)
+
+  // Redirect to login if no session and trying to access protected routes
+  if (!session && req.nextUrl.pathname.startsWith('/dashboard')) {
+    console.log('Redirecting to login from middleware')
     return NextResponse.redirect(new URL('/login', req.url))
   }
 
-  // If user is signed in and the current path is /login, redirect to /dashboard
+  // Redirect to dashboard if session exists and trying to access login
   if (session && req.nextUrl.pathname === '/login') {
+    console.log('Redirecting to dashboard from middleware')
     return NextResponse.redirect(new URL('/dashboard', req.url))
   }
 
@@ -24,13 +28,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     */
-    '/((?!_next/static|_next/image|favicon.ico).*)',
-  ],
+  matcher: ['/dashboard/:path*', '/login']
 }
