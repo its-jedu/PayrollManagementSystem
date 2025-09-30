@@ -1,73 +1,106 @@
 'use client';
 
-import { Button } from './button';
-import {
-  LayoutDashboard as DashboardIcon,
-  Briefcase,
-  Users,
-  Calendar,
-  Clock,
-  Settings,
-  LogOut,
+import React, { useState } from "react";
+import Link from "next/link";
+import { 
+  LayoutDashboard, Briefcase, Users, Calendar, Settings, ChevronDown 
 } from "lucide-react";
-import { useAuth } from '@/hooks/useAuth';
-import { useRouter } from 'next/navigation';
+
+interface SidebarItem {
+  name: string;
+  icon: JSX.Element;
+  href?: string;
+  children?: { name: string; href: string }[];
+}
 
 export default function Sidebar({ active }: { active: string }) {
-  const { logout } = useAuth();
-  const router = useRouter();
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
-  const menuItems = [
-    { name: 'Dashboard', icon: <DashboardIcon size={18} /> },
-    { name: 'Job Desk', icon: <Briefcase size={18} /> },
-    { name: 'Employee', icon: <Users size={18} /> },
-    { name: 'Leave', icon: <Calendar size={18} /> },
-    { name: 'Attendance', icon: <Clock size={18} /> },
-    { name: 'Administration', icon: <Settings size={18} /> },
-    { name: "Setting", icon: <Settings size={18} /> },
+  const menuItems: SidebarItem[] = [
+    { name: 'Dashboard', icon: <LayoutDashboard size={18} />, href: '/dashboard' },
+    { name: 'Job Desk', icon: <Briefcase size={18} />, href: '/job-desk' },
+    {
+      name: 'Employee',
+      icon: <Users size={18} />,
+      children: [
+        { name: 'All Employees', href: '/employee/all' },
+        { name: 'Add Employee', href: '/employee/add' },
+      ]
+    },
+    {
+      name: 'Leave',
+      icon: <Calendar size={18} />,
+      children: [
+        { name: 'Leave Requests', href: '/leave/requests' },
+        { name: 'Leave Policies', href: '/leave/policies' },
+      ]
+    },
+    {
+      name: 'Attendance',
+      icon: <Calendar size={18} />,
+      children: [
+        { name: 'Daily Attendance', href: '/attendance/daily' },
+        { name: 'Monthly Report', href: '/attendance/monthly' },
+      ]
+    },
+    {
+      name: 'Administration',
+      icon: <Briefcase size={18} />,
+      children: [
+        { name: 'Roles & Permissions', href: '/admin/roles' },
+        { name: 'Settings', href: '/admin/settings' },
+      ]
+    },
+    { name: 'Settings', icon: <Settings size={18} />, href: '/settings' },
   ];
 
-  const handleLogout = () => {
-    logout();
-    router.push('/login');
-  };
-
   return (
-    <aside className="w-64 bg-sidebar h-full flex flex-col justify-between">
-      <div>
-        <div className="p-6 border-b border-sidebar-border">
-          <h2 className="text-xl font-bold text-white">Payroll System</h2>
-        </div>
-
-        <nav className="p-4 flex flex-col gap-2">
-          {menuItems.map((item) => (
-            <Button
-              key={item.name}
-              variant="ghost"
-              className={`flex items-center gap-3 px-4 py-2 rounded-lg ${
-                active === item.name
-                  ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold'
-                  : 'text-white hover:bg-sidebar-accent'
+    <aside className="w-64 bg-neutral-10 h-screen p-4 shadow-md flex flex-col gap-2">
+      {menuItems.map((item) => (
+        <div key={item.name} className="flex flex-col">
+          {item.children ? (
+            <div>
+              <button
+                onClick={() => setOpenDropdown(openDropdown === item.name ? null : item.name)}
+                className={`w-full flex justify-between items-center px-3 py-2 rounded hover:bg-neutral-20 transition ${
+                  active === item.name ? 'bg-neutral-20 font-semibold' : ''
+                }`}
+              >
+                <div className="flex items-center gap-2">{item.icon}{item.name}</div>
+                <ChevronDown
+                  size={16}
+                  className={`transition-transform ${openDropdown === item.name ? 'rotate-180' : 'rotate-0'}`}
+                />
+              </button>
+              {openDropdown === item.name && (
+                <div className="flex flex-col pl-8 mt-1 gap-1">
+                  {item.children.map((child) => (
+                    <Link
+                      key={child.name}
+                      href={child.href}
+                      className={`px-2 py-1 rounded hover:bg-neutral-20 transition ${
+                        active === child.name ? 'bg-neutral-40 font-medium' : ''
+                      }`}
+                    >
+                      {child.name}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : (
+            <Link
+              href={item.href!}
+              className={`flex items-center gap-2 px-3 py-2 rounded hover:bg-neutral-20 transition ${
+                active === item.name ? 'bg-neutral-20 font-semibold' : ''
               }`}
             >
               {item.icon}
-              <span>{item.name}</span>
-            </Button>
-          ))}
-        </nav>
-      </div>
-
-      {/* Logout Button */}
-      <div className="p-4 border-t">
-        <Button
-          variant="outline"
-          className="w-full flex items-center gap-2 text-red-500"
-          onClick={handleLogout}
-        >
-          <LogOut size={18} />
-          Logout
-        </Button>
-      </div>
+              {item.name}
+            </Link>
+          )}
+        </div>
+      ))}
     </aside>
   );
 }

@@ -19,15 +19,39 @@ const config: Config = {
     },
     extend: {
       colors: {
+        // Figma Colors
+        neutral: {
+          10: '#ffffff',
+          20: '#F5F5F5',
+          40: '#E0E0E0',
+          60: '#9e9e9e',
+          80: '#616161',
+          90: '#ffffff',
+          100: '#0A0A0A',
+        },
+        danger: {
+          main: '#FD304D',
+          surface: '#FFD6DB',
+          hover: '#D32940',
+        },
+        info: {
+          main: '#146ADC',
+          hover: '#1158B7',
+        },
+        primary: {
+          main: '#212143',
+        },
+        success: {
+          main: '#0A7E22',
+          surface: '#CEE5D3',
+        },
+
+        // Keep existing colors for backwards compatibility
         border: "hsl(214, 32%, 91%)",
         input: "hsl(214, 32%, 91%)",
         ring: "hsl(221, 83%, 53%)",
         background: "hsl(0, 0%, 100%)",
         foreground: "hsl(222, 84%, 5%)",
-        primary: {
-          DEFAULT: "hsl(221, 83%, 53%)",
-          foreground: "hsl(210, 40%, 98%)",
-        },
         secondary: {
           DEFAULT: "hsl(210, 40%, 96%)",
           foreground: "hsl(222, 84%, 5%)",
@@ -111,14 +135,8 @@ const config: Config = {
           "20%, 40%, 60%, 80%": { transform: "translateX(5px)" },
         },
         "fade-in-up": {
-          "0%": { 
-            opacity: "0",
-            transform: "translateY(20px)",
-          },
-          "100%": { 
-            opacity: "1",
-            transform: "translateY(0)",
-          },
+          "0%": { opacity: "0", transform: "translateY(20px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
         },
         "pulse-slow": {
           "0%, 100%": { opacity: "1" },
@@ -138,9 +156,7 @@ const config: Config = {
         "fade-in-up": "fade-in-up 0.6s ease-out",
         "pulse-slow": "pulse-slow 3s ease-in-out infinite",
       },
-      backdropBlur: {
-        xs: '2px',
-      },
+      backdropBlur: { xs: '2px' },
     },
   },
   plugins: [require("tailwindcss-animate")],

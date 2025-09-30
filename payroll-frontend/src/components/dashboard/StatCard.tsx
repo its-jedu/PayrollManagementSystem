@@ -1,30 +1,36 @@
-'use client';
+import React from "react";
+import { Users, Briefcase, Clock, CheckCircle2 } from "lucide-react";
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-
-export default function StatCard({
-  title,
-  value,
-  subtitle,
-  extra,
-}: {
+interface StatCardProps {
   title: string;
-  value: string;
-  subtitle: string;
-  extra: string;
-}) {
+  value: string | number;
+  paid: number | string;
+  unpaid: number | string;
+}
+
+const iconMap: Record<string, JSX.Element> = {
+  "Total Leave Allowance": <Briefcase size={24} className="text-info-main" />,
+  "Total Leave Taken": <CheckCircle2 size={24} className="text-success-main" />,
+  "Total Leave Available": <Users size={24} className="text-primary-main" />,
+  "Leave Request Pending": <Clock size={24} className="text-danger-main" />,
+};
+
+export default function StatCard({ title, value, paid, unpaid }: StatCardProps) {
   return (
-    <Card className="bg-white shadow-lg rounded-lg p-4 animate-fade-in-up">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-medium text-gray-500">{title}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="text-2xl font-bold text-gray-900">{value}</div>
-        <div className="flex justify-between items-center mt-2 text-xs text-gray-500">
-          <span>{subtitle}</span>
-          <span>{extra}</span>
+    <div className="bg-neutral-10 rounded-xl shadow-md p-6 flex flex-col gap-4 hover:shadow-lg transition-shadow">
+      <div className="flex justify-between items-start">
+        <div>
+          <p className="text-neutral-80 font-medium">{title}</p>
+          <h3 className="text-2xl font-bold text-neutral-100">{value}</h3>
         </div>
-      </CardContent>
-    </Card>
+        <div className="p-3 bg-neutral-20 rounded-lg">
+          {iconMap[title]}
+        </div>
+      </div>
+      <div className="flex justify-between text-sm text-neutral-60">
+        <span>Paid: {paid}</span>
+        <span>Unpaid: {unpaid}</span>
+      </div>
+    </div>
   );
 }
