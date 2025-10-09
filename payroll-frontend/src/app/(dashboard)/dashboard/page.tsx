@@ -12,7 +12,7 @@ export default function DashboardPage() {
         <Card className="col-span-2 bg-white shadow-sm border">
           <CardContent className="p-6">
             <h2 className="text-lg font-semibold text-gray-800">
-              Good to see you, Kimi 👋
+              Good to see you, Jedu 👋
             </h2>
             <p className="text-gray-500 text-sm mt-1">
               You came 15 minutes early today.

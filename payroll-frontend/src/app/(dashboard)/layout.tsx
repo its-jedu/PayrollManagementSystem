@@ -25,7 +25,7 @@ export default function DashboardLayout({ children }: Props) {
 
   const sidebarItems = [
     { name: "Dashboard", icon: LayoutDashboard, href: "/dashboard" },
-    { name: "Job Desk", icon: Briefcase, href: "/dashboard/jobdesk" },
+    { name: "Job Desk", icon: Briefcase, href: "/jobdesk" },
     { name: "Employee", icon: Users, href: "/dashboard/employee" },
     { name: "Leaves", icon: Calendar, href: "/dashboard/leaves" },
     { name: "Attendance", icon: Clock, href: "/dashboard/attendance" },
