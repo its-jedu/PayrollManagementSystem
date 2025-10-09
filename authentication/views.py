@@ -81,3 +81,37 @@ def create_user(request):
             
     except requests.RequestException as e:
         return Response({'error': 'User creation service unavailable'}, status=503)
+    
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def logout_user(request):
+    """
+    Logs the user out by revoking their refresh token from Supabase.
+    """
+    refresh_token = request.data.get('refresh_token')
+
+    if not refresh_token:
+        return Response({'error': 'Refresh token is required'}, status=400)
+
+    url = f"{settings.SUPABASE_URL}/auth/v1/logout"
+    headers = {
+        'apikey': settings.SUPABASE_ANON_KEY,
+        'Content-Type': 'application/json',
+        'Authorization': f'Bearer {refresh_token}',
+    }
+
+    try:
+        response = requests.post(url, headers=headers)
+
+        if response.status_code in [200, 204]:
+            return Response({'message': 'User logged out successfully'})
+        else:
+            error_data = response.json()
+            return Response(
+                {'error': error_data.get('message', 'Logout failed')},
+                status=response.status_code
+            )
+    except requests.RequestException:
+        return Response({'error': 'Logout service unavailable'}, status=503)
+

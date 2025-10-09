@@ -1,93 +1,119 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import Link from 'next/link';
-import { ChevronDown, Users, Calendar, Clock, Settings, Briefcase, Home } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
+import { ReactNode } from "react";
+import Link from "next/link";
+import {
+  LayoutDashboard,
+  Briefcase,
+  Users,
+  Calendar,
+  Clock,
+  Settings,
+  Shield,
+  LogOut,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { usePathname, useRouter } from "next/navigation";
 
-const sidebarItems = [
-  { name: 'Dashboard', href: '/dashboard', icon: <Home size={18} /> },
-  { name: 'Job Desk', href: '/dashboard/jobdesk', icon: <Briefcase size={18} /> },
-  { 
-    name: 'Employee', icon: <Users size={18} />, dropdown: [
-      { name: 'List', href: '/dashboard/employees/list' },
-      { name: 'Add Employee', href: '/dashboard/employees/add' }
-    ]
-  },
-  { 
-    name: 'Leave', icon: <Clock size={18} />, dropdown: [
-      { name: 'Requests', href: '/dashboard/leave/requests' },
-      { name: 'Balance', href: '/dashboard/leave/balance' }
-    ]
-  },
-  { 
-    name: 'Attendance', icon: <Calendar size={18} />, dropdown: [
-      { name: 'Records', href: '/dashboard/attendance/records' },
-      { name: 'Reports', href: '/dashboard/attendance/reports' }
-    ]
-  },
-  { 
-    name: 'Administration', icon: <Settings size={18} />, dropdown: [
-      { name: 'Roles', href: '/dashboard/admin/roles' },
-      { name: 'Permissions', href: '/dashboard/admin/permissions' }
-    ]
-  },
-  { 
-    name: 'Settings', icon: <Settings size={18} />, dropdown: [
-      { name: 'Profile', href: '/dashboard/settings/profile' },
-      { name: 'Preferences', href: '/dashboard/settings/preferences' }
-    ] 
-  },
-];
+interface Props {
+  children: ReactNode;
+}
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+export default function DashboardLayout({ children }: Props) {
+  const pathname = usePathname();
+  const router = useRouter();
+
+  const sidebarItems = [
+    { name: "Dashboard", icon: LayoutDashboard, href: "/dashboard" },
+    { name: "Job Desk", icon: Briefcase, href: "/dashboard/jobdesk" },
+    { name: "Employee", icon: Users, href: "/dashboard/employee" },
+    { name: "Leaves", icon: Calendar, href: "/dashboard/leaves" },
+    { name: "Attendance", icon: Clock, href: "/dashboard/attendance" },
+    { name: "Administration", icon: Shield, href: "/dashboard/administration" },
+    { name: "Setting", icon: Settings, href: "/dashboard/setting" },
+  ];
+
+  async function handleLogout() {
+    try {
+      const refreshToken = localStorage.getItem("refresh_token");
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/logout/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ refresh_token: refreshToken }),
+      });
+      localStorage.clear();
+      router.push("/login");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  }
+
 
   return (
     <div className="flex min-h-screen bg-gray-100">
       {/* Sidebar */}
-      <aside className="w-64 bg-white shadow-md p-6 flex flex-col">
-        <div className="mb-8 text-2xl font-bold">PayrollSystem</div>
-        <nav className="flex-1 space-y-2">
-          {sidebarItems.map((item) => (
-            <div key={item.name}>
-              <button
-                className="flex items-center justify-between w-full gap-2 p-3 rounded-lg hover:bg-blue-600 hover:text-white transition-colors"
-                onClick={() => item.dropdown ? setOpenDropdown(openDropdown === item.name ? null : item.name) : undefined}
-              >
-                <div className="flex items-center gap-2">{item.icon}{item.name}</div>
-                {item.dropdown && <ChevronDown size={16} className={openDropdown === item.name ? 'rotate-180' : ''} />}
-              </button>
-              {item.dropdown && openDropdown === item.name && (
-                <div className="pl-8 mt-1 flex flex-col space-y-1">
-                  {item.dropdown.map((drop) => (
-                    <Link key={drop.name} href={drop.href} className="p-2 rounded hover:bg-blue-100">
-                      {drop.name}
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
-        </nav>
-        <div className="mt-auto text-sm text-gray-500">
-          © {new Date().getFullYear()} PayrollSystem
+      <aside className="w-64 bg-white border-r shadow-sm flex flex-col justify-between">
+        <div>
+          <div className="p-6 text-xl font-bold text-blue-700 tracking-wide">
+            BIPAY
+          </div>
+          <nav className="flex flex-col space-y-1 px-4 text-gray-700">
+            {sidebarItems.map(({ name, icon: Icon, href }) => {
+              const isActive = pathname === href;
+              return (
+                <Link
+                  key={name}
+                  href={href}
+                  className={`flex items-center gap-3 p-2 rounded-lg transition-colors font-medium text-sm ${
+                    isActive
+                      ? "bg-blue-50 text-blue-600"
+                      : "hover:bg-gray-100 text-gray-700"
+                  }`}
+                >
+                  <Icon
+                    className={`w-5 h-5 ${
+                      isActive ? "text-blue-600" : "text-gray-500"
+                    }`}
+                  />
+                  <span>{name}</span>
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
+
+        {/* ✅ Logout button (no alert, real action) */}
+        <div className="p-4 border-t">
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-3 p-2 w-full text-red-600 hover:bg-red-50 rounded-lg font-medium text-sm transition-colors"
+          >
+            <LogOut className="w-5 h-5" />
+            <span>Logout</span>
+          </button>
         </div>
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-8 overflow-auto">
-        {/* Top Header */}
-        <header className="flex justify-between items-center mb-8">
-          <h2 className="text-xl font-semibold">Dashboard</h2>
-          <div className="flex items-center gap-4">
-            <Badge variant="secondary">Admin</Badge>
-            <div className="w-10 h-10 bg-gray-300 rounded-full"></div>
+      <main className="flex-1 flex flex-col">
+        {/* Topbar */}
+        <header className="flex items-center justify-between px-6 py-4 bg-white border-b">
+          <h1 className="text-lg font-semibold text-gray-800">Dashboard</h1>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm">
+              + Buddy Punching
+            </Button>
+            <Button
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+              size="sm"
+            >
+              Manager POV
+            </Button>
           </div>
         </header>
 
         {/* Page Content */}
-        <div>{children}</div>
+        <div className="p-6 space-y-6">{children}</div>
       </main>
     </div>
   );
