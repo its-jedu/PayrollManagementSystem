@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Python
 __pycache__/
 *.py[cod]
@@ -17,3 +18,7 @@ db.sqlite3
 
 # VS Code
 .vscode/
+=======
+.env
+.venv/
+>>>>>>> 9e01307a64a0db42805d1db98559bc1c4c30ed0e
