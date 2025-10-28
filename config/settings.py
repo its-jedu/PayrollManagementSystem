@@ -84,7 +84,7 @@ CORS_ALLOWED_ORIGINS = [
 # Database
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',  # Switch to Postgres in production if needed
+        'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
