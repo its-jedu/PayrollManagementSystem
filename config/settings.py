@@ -107,11 +107,10 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 # Directory where collectstatic will collect static files
-STATIC_ROOT = str(BASE_DIR / "staticfiles")
-
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Ensure the staticfiles directory exists (safe for deployment)
-STATIC_ROOT.mkdir(parents=True, exist_ok=True)
+# STATIC_ROOT.mkdir(parents=True, exist_ok=True)
 
 # Whitenoise for serving static files in production
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
