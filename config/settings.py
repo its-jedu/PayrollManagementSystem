@@ -27,7 +27,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
     'rest_framework',
     'employees',
     'payroll',
@@ -110,8 +109,9 @@ STATIC_URL = '/static/'
 # Directory where collectstatic will collect static files
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# Ensure the staticfiles directory exists
-os.makedirs(STATIC_ROOT, exist_ok=True)
+# Ensure the staticfiles directory exists (safe for deployment)
+if not STATIC_ROOT.exists():
+    STATIC_ROOT.mkdir(parents=True, exist_ok=True)
 
 # Whitenoise for serving static files in production
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
@@ -123,7 +123,3 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_KEY")
 SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY")
-
-# Render-specific settings
-# Optional: set host and port if needed
-# os.environ.setdefault("PORT", "10000")
