@@ -1,7 +1,12 @@
 from .base import *
 
 DEBUG = True
-ALLOWED_HOSTS = ['staging.yourdomain.com']
+ALLOWED_HOSTS = [
+    'payroll-backend-staging.onrender.com',
+    'localhost',
+    '127.0.0.1'
+]
+
 
 # Database (PostgreSQL example)
 DATABASES = {
